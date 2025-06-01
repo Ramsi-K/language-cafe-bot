@@ -73,6 +73,7 @@ export default [
   'Taiwanese',
   'Tagalog',
   'Tamil',
+  'Tetum',
   'Thai',
   'Turkish',
   'Ukrainian',
