@@ -15,8 +15,8 @@ export default async (interaction) => {
     .setLabel('Put target languages')
     .setPlaceholder('ex: Korean, Japanese (Put comma to separate languages)')
     .setValue(studyBuddy?.targetLanguage || '')
-    .setStyle(TextInputStyle.Short)
-    .setMaxLength(100);
+    .setStyle(TextInputStyle.Paragraph)
+    .setMaxLength(500);
 
   const level = new TextInputBuilder()
     .setCustomId('level')

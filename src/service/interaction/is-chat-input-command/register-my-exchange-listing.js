@@ -17,16 +17,16 @@ export default async (interaction) => {
     .setLabel('Put target languages')
     .setPlaceholder('ex: Korean, Japanese (Put comma to separate languages)')
     .setValue(exchangePartner?.targetLanguage || '')
-    .setStyle(TextInputStyle.Short)
-    .setMaxLength(100);
+    .setStyle(TextInputStyle.Paragraph)
+    .setMaxLength(500);
 
   const offeredLanguage = new TextInputBuilder()
     .setCustomId('offeredLanguage')
     .setLabel('Put offered languages')
     .setPlaceholder('ex: English, Spanish (Put comma to separate languages)')
     .setValue(exchangePartner?.offeredLanguage || '')
-    .setStyle(TextInputStyle.Short)
-    .setMaxLength(100);
+    .setStyle(TextInputStyle.Paragraph)
+    .setMaxLength(500);
 
   const introduction = new TextInputBuilder()
     .setCustomId('introduction')
