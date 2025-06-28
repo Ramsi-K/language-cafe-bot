@@ -83,7 +83,7 @@ Individual point breakdown by game type:
 - **Counting**: 2 points per valid message
 - **Shiritori**: 3 points per valid message
 - **Letter Change**: 5 points per valid message
-- **Emoji Blend**: (5 points × emoji count) + (message length ÷ 10) bonus points
+- **Emoji Blend**: (5 points × emoji count) + (message length ÷ 30) bonus points
 - **Pass the Coffee Cup**: 50 points per successful turn
 - **Match-Match**:
   - 2 matches: 50 points each

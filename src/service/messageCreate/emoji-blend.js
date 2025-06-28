@@ -70,7 +70,7 @@ export default async (message) => {
       const emojiCount = [...segmenter.segment(lastBotMessageContent)].length;
 
       const basePoints = emojiCount * 5;
-      const messageBonus = Math.floor(currentMessageContentArray.length / 10);
+      const messageBonus = Math.floor(currentMessageContentArray.length / 50);
       const totalPoints = basePoints + messageBonus;
 
       await Point.updateOne(
