@@ -78,7 +78,7 @@ export default async (message) => {
 
     await point.updateOne(
       { id: randomUserId },
-      { $inc: { passTheCoffeeCup: 20 } },
+      { $inc: { passTheCoffeeCup: 50 } },
       { upsert: true },
     );
   } catch (error) {

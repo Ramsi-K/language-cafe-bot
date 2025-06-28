@@ -1,7 +1,7 @@
 import { bold, time, userMention } from 'discord.js';
+import config from '../../config/index.js';
 import { studyCheckInKeyv } from '../../db/keyvInstances.js';
 import channelLog, { generateMessageCreateLogContent } from '../utils/channel-log.js';
-import config from '../../config/index.js';
 
 const sendNewStickyMessage = async (message) => {
   const title = 'How to Use the study-check-in Bot';
@@ -165,6 +165,25 @@ export default async (message) => {
       'Success is the sum of small efforts, repeated day in and day out. - Robert Collier',
       'Patience, persistence, and perspiration make an unbeatable combination for success. - Napoleon Hill',
       'Success is no accident. It is hard work, perseverance, learning, studying, sacrifice, and most of all, love of what you are doing or learning to do. - Pelé',
+      'Great works are performed not by strength but by perseverance. - Samuel Johnson',
+      'The only way to do great work is to love what you do. - Steve Jobs',
+      'Genius is one percent inspiration and ninety-nine percent perspiration. - Thomas Edison',
+      'Fall seven times, stand up eight. - Japanese Proverb',
+      'No retreat, no surrender.',
+      'Keep calm and carry on.',
+      'When you feel like quitting, think about why you started.',
+      'It always seems impossible until it’s done. - Nelson Mandela',
+      'The harder you work for something, the greater you’ll feel when you achieve it.',
+      'Chop your own wood and it will warm you twice. - Old Proverb',
+      'A smooth sea never made a skilled sailor.',
+      'The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt',
+      'Winners never quit and quitters never win. - Vince Lombardi',
+      'It’s not whether you get knocked down, it’s whether you get up. - Vince Lombardi',
+      'Believe you can and you’re halfway there. - Theodore Roosevelt',
+      'The best way out is always through. - Robert Frost',
+      'An inch of movement will bring you closer to your goals than a mile of intention. - Steve Maraboli',
+      'Continuous effort—not strength or intelligence—is the key to unlocking our potential. - Winston Churchill',
+      'Hard work beats talent when talent doesn’t work hard.',
     ];
 
     message.reply({

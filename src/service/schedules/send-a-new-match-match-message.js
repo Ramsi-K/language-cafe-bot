@@ -134,14 +134,14 @@ const sendANewMatchMatchMessage = async () => {
     );
 
     const bulkWriteArr = [
-      ...createBulkWriteOperations(matchedTwoDescriptionArr, 15),
-      ...createBulkWriteOperations(matchedThreeDescriptionArr, 10),
-      ...createBulkWriteOperations(matchedFourDescriptionArr, 5),
-      ...createBulkWriteOperations(overMatchedDescriptionArr, 2),
+      ...createBulkWriteOperations(matchedTwoDescriptionArr, 50),
+      ...createBulkWriteOperations(matchedThreeDescriptionArr, 25),
+      ...createBulkWriteOperations(matchedFourDescriptionArr, 10),
+      ...createBulkWriteOperations(overMatchedDescriptionArr, 5),
       ...notMachedParticipants.map((item) => ({
         updateOne: {
           filter: { id: item.id },
-          update: { $inc: { matchMatch: 1 } },
+          update: { $inc: { matchMatch: 3 } },
           upsert: true,
         },
       })),
@@ -152,27 +152,27 @@ const sendANewMatchMatchMessage = async () => {
     const description = `# Topic: ${matchMatchTopic.topic}
     ${createDescriptionSection(
       matchedTwoDescriptionArr,
-      15,
+      50,
       'Matching Users',
       '😆',
     )}${createDescriptionSection(
       matchedThreeDescriptionArr,
-      10,
+      25,
       'Matches with 3 Users',
       '😁',
     )}${createDescriptionSection(
       matchedFourDescriptionArr,
-      5,
+      10,
       'Matches with 4 Users',
       '😄',
     )}${createDescriptionSection(
       overMatchedDescriptionArr,
-      2,
+      5,
       'Matches with More Than 4 Users',
       '😀',
     )}${
       notMachedParticipants.length > 0
-        ? `\n### Users With No Match 🙂 (1 point)\n${notMachedParticipants
+        ? `\n### Users With No Match 🙂 (3 points)\n${notMachedParticipants
             .map(
               (item) =>
                 `${userMention(item.id)} ${item.submission} (${item.submissionInTargetLanguage})`,

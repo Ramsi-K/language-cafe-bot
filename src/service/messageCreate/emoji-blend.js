@@ -65,13 +65,16 @@ export default async (message) => {
 
       const messageAuthorId = message.author.id;
 
-      const point = Math.floor(
-        lastBotMessageContent.length / 2 + currentMessageContentArray.length / 100,
-      );
+      const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+      const emojiCount = [...segmenter.segment(lastBotMessageContent)].length;
+
+      const basePoints = emojiCount * 5;
+      const messageBonus = Math.floor(currentMessageContentArray.length / 10);
+      const totalPoints = basePoints + messageBonus;
 
       await Point.updateOne(
         { id: messageAuthorId },
-        { $inc: { emojiBlend: lastBotMessageContent.length * 5 } },
+        { $inc: { emojiBlend: totalPoints } },
         { upsert: true },
       );
 
@@ -81,7 +84,7 @@ export default async (message) => {
             color: 0xc3c3e5,
             footer: {
               icon_url: message.author.avatarURL(),
-              text: `${message.author.globalName}(${message.author.username}#${message.author.discriminator}) earned ${point} point(s).`,
+              text: `${message.author.globalName}(${message.author.username}#${message.author.discriminator}) earned ${totalPoints} point(s).`,
             },
           },
         ],
