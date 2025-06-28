@@ -130,7 +130,9 @@ export default async (interaction) => {
               if (now.getTime() <= Date.now()) now.setDate(now.getDate() + 1);
               return now;
             })().getTime() / 1000,
-          )}:R>\n\nClick </match-match:${matchMatchCommandId}> here and send it to participate\n\nHow to Play: https://discord.com/channels/739911855795077282/1244836542036443217/1244923513199005758`,
+          )}:R>\n\nClick </match-match:${matchMatchCommandId}> here and send it to participate\n\nHow to Play: https://discord.com/channels/739911855795077282/1244836542036443217/1244923513199005758\nPoint Leaderboard: </word-games-point-leaderboard:${
+            config.POINTS_LEADERBOARD_COMMAND_ID
+          }>`,
         },
       ],
     });

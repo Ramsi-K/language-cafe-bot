@@ -8,6 +8,8 @@ import CategoryScore from '../../models/category-score.js';
 import Category from '../../models/category.js';
 import Point from '../../models/point.js';
 
+const { CLIENT_ID: clientId, POINTS_LEADERBOARD_COMMAND_ID: pointsLeaderboardCommandId } = config;
+
 const sendNewStickyMessage = async ({ message, currentCategory, filteredCategoryAlphabet }) => {
   const title = 'Current Category';
 
@@ -15,7 +17,7 @@ const sendNewStickyMessage = async ({ message, currentCategory, filteredCategory
 
   const stickyMessages = currentMessages.filter(
     (currentMessage) =>
-      currentMessage?.author?.id === config.CLIENT_ID && currentMessage?.embeds[0]?.title === title,
+      currentMessage?.author?.id === clientId && currentMessage?.embeds[0]?.title === title,
   );
 
   await Promise.all(stickyMessages.map((stickyMessage) => stickyMessage.delete().catch(() => {})));
@@ -46,7 +48,7 @@ const sendNewStickyMessage = async ({ message, currentCategory, filteredCategory
           .map((e) => alphabetEmojis[e])
           .join(
             ', ',
-          )}\n\nHow to Play\nhttps://discord.com/channels/739911855795077282/1235394383700955217/1235681286559895624`,
+          )}\n\nHow to Play: https://discord.com/channels/739911855795077282/1235394383700955217/1235681286559895624\nPoint Leaderboard: </word-games-point-leaderboard:${pointsLeaderboardCommandId}>`,
       },
     ],
   });
