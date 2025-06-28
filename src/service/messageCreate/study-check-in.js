@@ -243,7 +243,7 @@ export default async (message) => {
 
   content += additionalContent;
 
-  content += '\n### This message will be deleted in 1 minute.';
+  content += '\n### This message will be deleted in 3 minute.';
 
   const embed = {
     color: COLORS.PRIMARY,
@@ -256,7 +256,7 @@ export default async (message) => {
   const replyMessage = await message.reply({ embeds: [embed, ...additionalEmbeds] });
   setTimeout(() => {
     replyMessage.delete().catch(() => {});
-  }, 1000 * 60);
+  }, 1000 * 60 * 3);
 
   sendNewStickyMessage(message);
 };
