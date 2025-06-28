@@ -1,4 +1,5 @@
 import { ButtonStyle } from 'discord.js';
+import { COLORS } from '../../../constants/index.js';
 import PomodoroGroup from '../../../models/pomodoro-group.js';
 
 export default async (interaction) => {
@@ -12,7 +13,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'There are no pomodoro groups to join.',
         },
       ],
@@ -28,7 +29,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'You are already in a pomodoro group.',
         },
       ],
@@ -69,7 +70,7 @@ export default async (interaction) => {
     ];
 
     return {
-      color: 0xc3c3e5,
+      color: COLORS.PRIMARY,
       description,
       fields,
     };
@@ -78,7 +79,7 @@ export default async (interaction) => {
   await interaction.editReply({
     embeds: [
       {
-        color: 0xc3c3e5,
+        color: COLORS.PRIMARY,
         description: '### Select a group to join.',
       },
       ...groupsInformationEmbeds,

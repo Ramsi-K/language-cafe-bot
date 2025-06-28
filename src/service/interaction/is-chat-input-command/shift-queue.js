@@ -1,3 +1,4 @@
+import { COLORS } from '../../../constants/index.js';
 import Queue from '../../../models/queue.js';
 import { getCurrentQueueDescription } from './get-queue.js';
 
@@ -10,7 +11,7 @@ export default async (interaction) => {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'Queue is empty.',
           },
         ],
@@ -24,7 +25,7 @@ export default async (interaction) => {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'Queue has been shifted.',
         },
       ],
@@ -35,7 +36,7 @@ export default async (interaction) => {
     await channel.send({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: currentQueueDescription,
         },
       ],

@@ -1,3 +1,4 @@
+import { COLORS } from '../../../constants/index.js';
 import MatchMatchTopic from '../../../models/match-match-topic.js';
 
 export default async (interaction) => {
@@ -12,7 +13,7 @@ export default async (interaction) => {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: `Match-match topic created successfully\n\nTopic\`\`\`\n${topic}\n\`\`\``,
           },
         ],
@@ -22,7 +23,7 @@ export default async (interaction) => {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'Failed to create match-match topic',
           },
         ],
@@ -35,7 +36,7 @@ export default async (interaction) => {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'Failed to create match-match topic (Internal Server Error)',
         },
       ],

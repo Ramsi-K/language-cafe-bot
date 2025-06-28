@@ -1,7 +1,8 @@
 import { userMention } from 'discord.js';
+import client from '../../../client/index.js';
+import { COLORS } from '../../../constants/index.js';
 import PomodoroGroup from '../../../models/pomodoro-group.js';
 import { finishedPomodoro } from './create-pomodoro-group.js';
-import client from '../../../client/index.js';
 
 export default async (interaction) => {
   try {
@@ -19,7 +20,7 @@ export default async (interaction) => {
       await interaction.editReply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'You are not in a pomodoro group.',
           },
         ],
@@ -39,7 +40,7 @@ export default async (interaction) => {
       await interaction.editReply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'Failed to leave the pomodoro group.',
           },
         ],
@@ -54,7 +55,7 @@ export default async (interaction) => {
     await interaction.channel.send({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: `${userMention(interaction.user.id)} left the pomodoro group \`${
             pomodoroGroup.name
           }\`.`,

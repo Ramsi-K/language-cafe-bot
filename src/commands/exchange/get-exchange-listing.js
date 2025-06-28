@@ -7,11 +7,12 @@ import {
   userMention,
 } from 'discord.js';
 import { Op } from 'sequelize';
+import client from '../../client/index.js';
+import { COLORS } from '../../constants/index.js';
 import ExchangePartner from '../../models/ExchangePartner.js';
 import channelLog, {
   generateInteractionCreateLogContent,
 } from '../../service/utils/channel-log.js';
-import client from '../../client/index.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -30,7 +31,7 @@ export default {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             title: 'Get Language Exchange Partner Listing',
             description: `${userMention(
               interaction.user.id,
@@ -72,7 +73,7 @@ export default {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             title: 'Get Language Exchange Partner Listing',
             description: `${userMention(
               interaction.user.id,
@@ -95,7 +96,7 @@ export default {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title: `1/${partnerListLength} Partner`,
           description: `${userMention(partnerObject.id)}`,
           fields: [

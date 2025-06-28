@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, bold, time } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
 import { studyCheckInKeyv } from '../../db/keyvInstances.js';
 import channelLog, {
   generateInteractionCreateLogContent,
@@ -84,7 +85,7 @@ export default {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: content,
           thumbnail: {
             url: interaction.user.displayAvatarURL(),

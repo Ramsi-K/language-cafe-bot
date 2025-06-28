@@ -1,3 +1,4 @@
+import { COLORS } from '../../../constants/index.js';
 import Queue from '../../../models/queue.js';
 
 export const getCurrentQueueDescription = async () => {
@@ -32,7 +33,7 @@ export default async (interaction) => {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description,
         },
       ],

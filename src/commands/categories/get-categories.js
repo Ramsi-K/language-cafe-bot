@@ -1,4 +1,5 @@
 import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
 import Category from '../../models/category.js';
 import channelLog, {
   generateInteractionCreateLogContent,
@@ -21,7 +22,7 @@ export default {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             title: 'Categories',
             description: `\`\`\`\n${description}\n\`\`\``,
           },

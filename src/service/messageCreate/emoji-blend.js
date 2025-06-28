@@ -1,5 +1,6 @@
 import { Chance } from 'chance';
 import config from '../../config/index.js';
+import { COLORS } from '../../constants/index.js';
 import emojiList from '../../data/emojis.js';
 import Point from '../../models/point.js';
 
@@ -28,7 +29,7 @@ export default async (message) => {
       message.channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: generateRandomThreeUniqueEmoji(),
           },
         ],
@@ -39,7 +40,7 @@ export default async (message) => {
       await message.channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description:
               'Please send a proper message that includes the emojis to continue the game.',
           },
@@ -81,7 +82,7 @@ export default async (message) => {
       await message.channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             footer: {
               icon_url: message.author.avatarURL(),
               text: `${message.author.globalName}(${message.author.username}#${message.author.discriminator}) earned ${totalPoints} point(s).`,

@@ -1,3 +1,4 @@
+import { COLORS } from '../../../constants/index.js';
 import Point, { getTotalPoints } from '../../../models/point.js';
 import channelLog, { generateInteractionCreateLogContent } from '../../utils/channel-log.js';
 
@@ -15,7 +16,7 @@ export default async (interaction) => {
       await interaction.editReply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'There are no points yet.',
           },
         ],
@@ -64,7 +65,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description,
         },
       ],

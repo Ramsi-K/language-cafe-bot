@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, bold, time, userMention } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
 import { studyCheckInKeyv } from '../../db/keyvInstances.js';
 import channelLog, {
   generateInteractionCreateLogContent,
@@ -78,7 +79,7 @@ export default {
     if (!content) content = 'No one has an active streak yet.';
 
     const embed = {
-      color: 0xc3c3e5,
+      color: COLORS.PRIMARY,
       description: content,
     };
 

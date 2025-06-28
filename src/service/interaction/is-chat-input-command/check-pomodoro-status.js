@@ -12,7 +12,7 @@ export default async (interaction) => {
       await interaction.editReply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'No pomodoro group is active.',
           },
         ],
@@ -30,7 +30,7 @@ export default async (interaction) => {
       await interaction.editReply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'You are not in a pomodoro group.',
           },
         ],
@@ -72,7 +72,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description,
           fields,
         },

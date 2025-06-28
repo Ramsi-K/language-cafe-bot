@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, userMention } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
 import StudyBuddy from '../../models/study-buddy.js';
 import channelLog, {
   generateInteractionCreateLogContent,
@@ -23,7 +24,7 @@ export default {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title: 'Delete Study Buddy Listing',
           description: content,
         },

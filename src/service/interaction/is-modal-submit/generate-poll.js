@@ -1,4 +1,5 @@
 import { time } from 'discord.js';
+import { COLORS } from '../../../constants/index.js';
 import pollEmojiArray from '../../../data/poll-emoji-array.js';
 
 export default async (interaction) => {
@@ -73,7 +74,7 @@ export default async (interaction) => {
   const content = `${messageContent}\n${listContents}`;
 
   const embed = {
-    color: 0xc3c3e5,
+    color: COLORS.PRIMARY,
     description: content,
   };
 

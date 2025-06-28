@@ -32,7 +32,7 @@ export default {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             title: 'Get Study Buddy Listings',
             description: `${userMention(
               interaction.user.id,
@@ -76,7 +76,7 @@ export default {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             title: 'Get Study Buddy Listings',
             description: `${userMention(interaction.user.id)}, there are no study buddy matches.`,
           },
@@ -97,7 +97,7 @@ export default {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title: `1/${studyBuddyListLength} Study Buddy`,
           description: `${userMention(studyBuddyObject.id)}`,
           fields: [

@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, userMention } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
 import ExchangePartner from '../../models/ExchangePartner.js';
 import channelLog, {
   generateInteractionCreateLogContent,
@@ -21,7 +22,7 @@ export default {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title: 'Delete Language Exchange Partner Listing',
           description: content,
         },

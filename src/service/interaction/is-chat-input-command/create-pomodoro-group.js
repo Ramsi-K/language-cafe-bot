@@ -1,6 +1,7 @@
 import { userMention } from 'discord.js';
 import schedule from 'node-schedule';
 import client from '../../../client/index.js';
+import { COLORS } from '../../../constants/index.js';
 import PomodoroGroup from '../../../models/pomodoro-group.js';
 
 export const finishedPomodoro = async ({ groupName, channel }) => {
@@ -12,7 +13,7 @@ export const finishedPomodoro = async ({ groupName, channel }) => {
   await channel.send({
     embeds: [
       {
-        color: 0xc3c3e5,
+        color: COLORS.PRIMARY,
         description: `The pomodoro study group \`${groupName}\` has now finished and will be deleted.`,
       },
     ],
@@ -54,7 +55,7 @@ export const putPomodoroScheduleJob = async ({
           await channel.send({
             embeds: [
               {
-                color: 0xc3c3e5,
+                color: COLORS.PRIMARY,
                 description: `There is no one in the pomodoro study group \`${groupName}\`.`,
               },
             ],
@@ -90,7 +91,7 @@ export const putPomodoroScheduleJob = async ({
           await channel.send({
             embeds: [
               {
-                color: 0xc3c3e5,
+                color: COLORS.PRIMARY,
                 description,
                 fields,
               },
@@ -132,7 +133,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'Timer pattern is not valid.',
         },
       ],
@@ -145,7 +146,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'Each time option should be more than 1 minute and less than 100 minutes.',
         },
       ],
@@ -162,7 +163,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'You are already in a pomodoro group.',
         },
       ],
@@ -176,7 +177,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: `A group with the name \`${groupName}\` already exists.`,
         },
       ],
@@ -200,7 +201,7 @@ export default async (interaction) => {
     await interaction.editReply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'Failed to create a new group.',
         },
       ],
@@ -214,7 +215,7 @@ export default async (interaction) => {
   await interaction.channel.send({
     embeds: [
       {
-        color: 0xc3c3e5,
+        color: COLORS.PRIMARY,
         description: `${userMention(interaction.user.id)} created a new pomodoro study group.`,
         fields: [
           {
@@ -260,7 +261,7 @@ export default async (interaction) => {
   await interaction.channel.send({
     embeds: [
       {
-        color: 0xc3c3e5,
+        color: COLORS.PRIMARY,
         description,
         fields,
       },

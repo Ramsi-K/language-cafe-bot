@@ -1,8 +1,9 @@
 import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
+import MatchMatchTopic from '../../models/match-match-topic.js';
 import channelLog, {
   generateInteractionCreateLogContent,
 } from '../../service/utils/channel-log.js';
-import MatchMatchTopic from '../../models/match-match-topic.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -23,7 +24,7 @@ export default {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             title: 'Match-match Topics',
             description: `\`\`\`\n${description}\n\`\`\``,
           },

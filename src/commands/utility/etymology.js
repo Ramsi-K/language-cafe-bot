@@ -106,7 +106,7 @@ export default {
       content = checkMaxContentLength({ length: 4096, content, additionalContent });
 
       const embed = {
-        color: 0xc3c3e5,
+        color: COLORS.PRIMARY,
         title: `Etymology for ${input}`,
         description: content,
       };
@@ -117,7 +117,7 @@ export default {
         await interaction.editReply({
           embeds: [
             {
-              color: 0xc3c3e5,
+              color: COLORS.PRIMARY,
               title: 'No etymology found.',
               description: 'Please check your spelling and try again.',
             },

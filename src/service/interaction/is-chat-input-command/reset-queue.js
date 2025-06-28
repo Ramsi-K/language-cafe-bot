@@ -1,3 +1,4 @@
+import { COLORS } from '../../../constants/index.js';
 import Queue from '../../../models/queue.js';
 
 export default async (interaction) => {
@@ -7,7 +8,7 @@ export default async (interaction) => {
     interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'Queue has been reset.',
         },
       ],

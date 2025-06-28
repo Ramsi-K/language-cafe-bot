@@ -16,7 +16,7 @@ export default async (interaction) => {
       await interaction.channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'You are already in a pomodoro group.',
           },
         ],
@@ -36,7 +36,7 @@ export default async (interaction) => {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'Failed to join the pomodoro group.',
           },
         ],
@@ -49,7 +49,7 @@ export default async (interaction) => {
     await interaction.channel.send({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: `${userMention(
             interaction.user.id,
           )} joined the pomodoro group \`${groupName}\`.`,

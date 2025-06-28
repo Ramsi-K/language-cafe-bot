@@ -1,6 +1,7 @@
 import { userMention } from 'discord.js';
 import client from '../../client/index.js';
 import config from '../../config/index.js';
+import { COLORS } from '../../constants/index.js';
 import MatchMatchMessage from '../../models/match-match-message.js';
 import MatchMatchTopic from '../../models/match-match-topic.js';
 import Point from '../../models/point.js';
@@ -54,7 +55,7 @@ const sendANewMatchMatchMessage = async () => {
       await channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'There are no users participating in the current match-match topic.',
           },
         ],
@@ -68,7 +69,7 @@ const sendANewMatchMatchMessage = async () => {
       await channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description:
               "There's no match-match topic left.\nPlease ping the moderator to create a new topic.",
           },
@@ -184,7 +185,7 @@ const sendANewMatchMatchMessage = async () => {
     await channel.send({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description,
         },
       ],
@@ -209,7 +210,7 @@ const sendANewMatchMatchMessage = async () => {
     await channel.send({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title: stickyMessageTitle,
           description: `Topic\n\`\`\`\n${
             currentMatchMatchTopic.topic

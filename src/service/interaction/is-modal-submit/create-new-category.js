@@ -1,3 +1,4 @@
+import { COLORS } from '../../../constants/index.js';
 import A_TO_Z from '../../../data/a2z.js';
 import Category from '../../../models/category.js';
 
@@ -14,7 +15,7 @@ export default async (interaction) => {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: `Category created successfully\n\nMessage\`\`\`\n${message}\n\`\`\``,
           },
         ],
@@ -24,7 +25,7 @@ export default async (interaction) => {
       await interaction.reply({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'Failed to create category',
           },
         ],
@@ -37,7 +38,7 @@ export default async (interaction) => {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: 'Failed to create category (Internal Server Error)',
         },
       ],

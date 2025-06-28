@@ -1,11 +1,11 @@
 import { userMention } from 'discord.js';
 import latinize from 'latinize';
 import config from '../../config/index.js';
+import { COLORS } from '../../constants/index.js';
 import alphabetEmojis from '../../data/alphabet-emojis.js';
 import flagEmojis from '../../data/flag-emojis.js';
 import CategoryScore from '../../models/category-score.js';
 import Category from '../../models/category.js';
-import A_TO_Z from '../../data/a2z.js';
 import Point from '../../models/point.js';
 
 const sendNewStickyMessage = async ({ message, currentCategory, filteredCategoryAlphabet }) => {
@@ -24,7 +24,7 @@ const sendNewStickyMessage = async ({ message, currentCategory, filteredCategory
     await message.channel.send({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title,
           footer: {
             text: 'There is only one letter left, so you can use any word that contains the letter, not just one that starts with it.',
@@ -37,7 +37,7 @@ const sendNewStickyMessage = async ({ message, currentCategory, filteredCategory
   await message.channel.send({
     embeds: [
       {
-        color: 0xc3c3e5,
+        color: COLORS.PRIMARY,
         title,
         description: `Category\n\`\`\`\n${
           currentCategory.message
@@ -66,7 +66,7 @@ export default async (message) => {
       message.channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description:
               'There is no category.\nPlease ping the moderator to create a new category. ',
           },
@@ -135,7 +135,7 @@ export default async (message) => {
       await message.channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             title: 'Category Completed',
             description: `Category\n\`\`\`\n${
               currentCategory.message
@@ -162,7 +162,7 @@ export default async (message) => {
         await message.channel.send({
           embeds: [
             {
-              color: 0xc3c3e5,
+              color: COLORS.PRIMARY,
               description:
                 'There is no category.\nPlease ping the moderator to create a new category. ',
             },
@@ -175,7 +175,7 @@ export default async (message) => {
       await message.channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             title: 'New Category',
             description: `\`\`\`\n${currentCategory.message}\n\`\`\``,
           },

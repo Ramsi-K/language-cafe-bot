@@ -1,5 +1,6 @@
-import config from '../../config/index.js';
 import client from '../../client/index.js';
+import config from '../../config/index.js';
+import { COLORS } from '../../constants/index.js';
 import Point, { getTotalPoints } from '../../models/point.js';
 
 const {
@@ -16,7 +17,7 @@ const initializePoint = async () => {
       await channel.send({
         embeds: [
           {
-            color: 0xc3c3e5,
+            color: COLORS.PRIMARY,
             description: 'There are no points yet',
           },
         ],
@@ -54,7 +55,7 @@ const initializePoint = async () => {
     await channel.send({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: thisMonthDescription,
           thumbnail: {
             url: bestUser.avatarURL(),
@@ -66,7 +67,7 @@ const initializePoint = async () => {
     await channel.send({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           description: LeaderboardDescription,
         },
       ],

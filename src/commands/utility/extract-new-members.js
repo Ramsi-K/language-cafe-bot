@@ -28,7 +28,7 @@ export default {
     await interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title: 'Extract New Members',
           description: contentWithCodeBlock,
           footer: {

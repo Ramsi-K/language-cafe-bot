@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
 import languages from '../../data/languages.js';
 import channelLog, {
   generateInteractionCreateLogContent,
@@ -17,7 +18,7 @@ export default {
     return interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title: 'Language List',
           description: content,
         },

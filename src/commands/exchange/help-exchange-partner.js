@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, bold, channelMention } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
 import channelLog, {
   generateInteractionCreateLogContent,
 } from '../../service/utils/channel-log.js';
@@ -31,7 +32,7 @@ export default {
     return interaction.reply({
       embeds: [
         {
-          color: 0xc3c3e5,
+          color: COLORS.PRIMARY,
           title,
           description,
           image: {
