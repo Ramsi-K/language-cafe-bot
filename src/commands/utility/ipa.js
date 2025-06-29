@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { SlashCommandBuilder } from 'discord.js';
 import { JSDOM } from 'jsdom';
+import { COLORS } from '../../constants/index.js';
 import channelLog, {
   generateInteractionCreateLogContent,
 } from '../../service/utils/channel-log.js';

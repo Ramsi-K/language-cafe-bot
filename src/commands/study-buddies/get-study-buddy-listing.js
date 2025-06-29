@@ -8,6 +8,7 @@ import {
 } from 'discord.js';
 
 import client from '../../client/index.js';
+import { COLORS } from '../../constants/index.js';
 import StudyBuddy from '../../models/study-buddy.js';
 import channelLog, {
   generateInteractionCreateLogContent,

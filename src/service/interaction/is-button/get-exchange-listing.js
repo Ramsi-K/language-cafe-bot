@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, time, userMention } from 'discord.js';
 import { Op } from 'sequelize';
 import client from '../../../client/index.js';
+import { COLORS } from '../../../constants/index.js';
 import ExchangePartner from '../../../models/ExchangePartner.js';
 
 export default async (interaction) => {

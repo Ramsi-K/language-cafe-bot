@@ -1,5 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, time, userMention } from 'discord.js';
 import client from '../../../client/index.js';
+import { COLORS } from '../../../constants/index.js';
 import StudyBuddy from '../../../models/study-buddy.js';
 
 export default async (interaction) => {

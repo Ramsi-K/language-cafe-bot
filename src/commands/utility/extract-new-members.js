@@ -1,4 +1,5 @@
 import { PermissionFlagsBits, SlashCommandBuilder, userMention } from 'discord.js';
+import { COLORS } from '../../constants/index.js';
 import NewMember from '../../models/NewMember.js';
 import channelLog, {
   generateInteractionCreateLogContent,

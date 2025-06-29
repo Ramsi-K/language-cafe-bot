@@ -1,4 +1,5 @@
 import config from '../../../config/index.js';
+import { COLORS } from '../../../constants/index.js';
 import Queue from '../../../models/queue.js';
 import { getCurrentQueueDescription } from './get-queue.js';
 

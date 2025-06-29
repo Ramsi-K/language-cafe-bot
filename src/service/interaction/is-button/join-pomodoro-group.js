@@ -1,4 +1,5 @@
 import { userMention } from 'discord.js';
+import { COLORS } from '../../../constants/index.js';
 import PomodoroGroup from '../../../models/pomodoro-group.js';
 
 export default async (interaction) => {
