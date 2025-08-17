@@ -66,7 +66,7 @@ export default async (message) => {
 
     const randomUserId = reactedUserIdArray[Math.floor(Math.random() * reactedUserIdArray.length)];
 
-    const content = `${userMention(randomUserId)} pass the coffee cup!`;
+    const content = `${userMention(randomUserId)}, pass the coffee cup!`;
 
     await message.reply({
       content,
@@ -77,7 +77,7 @@ export default async (message) => {
     });
 
     await point.updateOne(
-      { id: randomUserId },
+      { id: lastMentionedUserId },
       { $inc: { passTheCoffeeCup: 50 } },
       { upsert: true },
     );

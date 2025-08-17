@@ -6,6 +6,7 @@ export default [
   'Ancient Egyptian',
   'Ancient Greek',
   'Arabic',
+  'Aramaic',
   'Armenian',
   'Australian Sign Language',
   'Azerbaijani',
