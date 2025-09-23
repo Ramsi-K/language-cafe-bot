@@ -115,11 +115,11 @@ export default async (interaction) => {
         )} has registered their language exchange partner listing.`,
         fields: [
           {
-            name: 'Target Language(s)',
+            name: 'Target Language(s) - (Language(s) You Are Learning)',
             value: `\`\`\`${refinedTargetLanguage}\`\`\``,
           },
           {
-            name: 'Offered Language(s)',
+            name: 'Offered Language(s) - (Your Fluent/Native Languages)',
             value: `\`\`\`${refinedOfferedLanguage}\`\`\``,
           },
           {

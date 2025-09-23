@@ -101,11 +101,11 @@ export default {
           description: `${userMention(partnerObject.id)}`,
           fields: [
             {
-              name: 'Target Language(s)',
+              name: 'Target Language(s) - (Language(s) You Are Learning)',
               value: `\`\`\`${partner.targetLanguage}\`\`\``,
             },
             {
-              name: 'Offered Language(s)',
+              name: 'Offered Language(s) - (Your Fluent/Native Languages)',
               value: `\`\`\`${partner.offeredLanguage}\`\`\``,
             },
             {

@@ -109,7 +109,7 @@ export default async (interaction) => {
         )} has registered their study buddy listing.`,
         fields: [
           {
-            name: 'Target Language(s)',
+            name: 'Target Language(s) - (Language(s) You Are Learning)',
             value: `\`\`\`${targetLanguageArray
               .map((e, i) => `- ${e}(${levelArray[i]})`)
               .join('\n')}\`\`\``,

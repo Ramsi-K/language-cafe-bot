@@ -119,7 +119,7 @@ export default async (interaction) => {
         description: `${userMention(studyBuddyObject.id)}`,
         fields: [
           {
-            name: 'Target Language(s)',
+            name: 'Target Language(s) - (Language(s) You Are Learning)',
             value: `\`\`\`${targetLanguageArray
               .map((e, i) => `- ${e}(${levelArray[i]})`)
               .join('\n')}\`\`\``,
