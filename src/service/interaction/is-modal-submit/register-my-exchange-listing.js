@@ -39,7 +39,9 @@ export default async (interaction) => {
             .map((e) => `\`${e}\``)
             .join(
               ', ',
-            )}\n\nYou can check the list of language options we have in our database by using the \`/get-language-list\` command.`,
+            )}\n\nYou can check the list of language options we have in our database by using the </get-language-list:${
+            config.GET_LANGUAGE_LIST_COMMAND_ID
+          }> command.`,
         },
       ],
       ephemeral: true,
@@ -66,7 +68,9 @@ export default async (interaction) => {
           title: 'Register Language Exchange Partner Listing',
           description: `Please enter a valid offered language(s).\n\nInvalid language(s): ${invalidOfferedLanguage.join(
             ', ',
-          )}\n\nYou can check the list of language options we have in our database by using the \`/get-language-list\` command.`,
+          )}\n\nYou can check the list of language options we have in our database by using the </get-language-list:${
+            config.GET_LANGUAGE_LIST_COMMAND_ID
+          }> command.`,
         },
       ],
       ephemeral: true,

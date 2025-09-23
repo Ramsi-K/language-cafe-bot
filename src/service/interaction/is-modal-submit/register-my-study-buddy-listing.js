@@ -38,7 +38,9 @@ export default async (interaction) => {
             .map((e) => `\`${e}\``)
             .join(
               ', ',
-            )}\n\nYou can check the list of language options we have in our database by using the \`/get-language-list\` command.`,
+            )}\n\nYou can check the list of language options we have in our database by using the </get-language-list:${
+            config.GET_LANGUAGE_LIST_COMMAND_ID
+          }> command.`,
         },
       ],
       ephemeral: true,
