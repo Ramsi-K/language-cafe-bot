@@ -144,7 +144,7 @@ export default async (interaction) => {
       {
         color: COLORS.PRIMARY,
         title: 'You have successfully registered your language exchange partner listing.',
-        description: `Now, click the blue text right here </get-exchange-listings:${config.GET_EXCHANGE_LISTINGS_COMMAND_ID}> and send it to show all potential exchange partners.\n\nIf nobody shows up, that just means that there isn't a perfect match for you in our database yet. Make sure to come back in the future to try again!`,
+        description: `Now, click the blue text right here </get-exchange-listings:${config.GET_EXCHANGE_LISTINGS_COMMAND_ID}> and send it to show all potential exchange partners.\n\nIf nobody shows up, that just means that there isn't a perfect match for you in our database yet. Make sure to come back in the future to try again!\n\nOnce you have found someone who you are interested in partnering up with, you can reach out to them via DMs (if their DMs are open) and ask to be partners. If not, you can ping them in this channel and ask. If their name does not pop up when you try to ping them, then they have left the server, so you should find another partner.`,
       },
     ],
     ephemeral: true,
