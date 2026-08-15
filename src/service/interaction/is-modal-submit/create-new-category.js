@@ -4,6 +4,8 @@ import Category from '../../../models/category.js';
 
 export default async (interaction) => {
   try {
+    await interaction.deferReply({ ephemeral: true });
+
     const message = interaction.fields.getTextInputValue('message');
 
     const res = await Category.create({
@@ -12,37 +14,34 @@ export default async (interaction) => {
     });
 
     if (res) {
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [
           {
             color: COLORS.PRIMARY,
             description: `Category created successfully\n\nMessage\`\`\`\n${message}\n\`\`\``,
           },
         ],
-        ephemeral: true,
       });
     } else {
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [
           {
             color: COLORS.PRIMARY,
             description: 'Failed to create category',
           },
         ],
-        ephemeral: true,
       });
     }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [
         {
           color: COLORS.PRIMARY,
           description: 'Failed to create category (Internal Server Error)',
         },
       ],
-      ephemeral: true,
     });
   }
 };
