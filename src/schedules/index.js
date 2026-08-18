@@ -6,6 +6,7 @@ import checkAndSendReminders from '../service/schedules/check-and-send-reminders
 import trackerDailyMaintenance from '../service/schedules/tracker-daily-maintenance.js';
 import trackerWeeklySnapshots from '../service/schedules/tracker-weekly-snapshots.js';
 import trackerDailyReminders from '../service/schedules/tracker-daily-reminders.js';
+import eventLifecycle from '../service/schedules/event-lifecycle.js';
 
 export default function schedules() {
   // every 10 seconds
@@ -17,6 +18,7 @@ export default function schedules() {
   schedule.scheduleJob('0 * * * *', () => {
     checkIfPassTheCoffeeCupLastMessageIsValid();
     checkAndSendReminders();
+    eventLifecycle();
   });
 
   // every day at 00:00
