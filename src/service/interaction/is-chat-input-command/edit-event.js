@@ -1,6 +1,6 @@
 import Event from '../../../models/event.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
-import { normaliseHashtag } from '../../utils/event-utils.js';
+import { findByIdOrName, normaliseHashtag } from '../../utils/event-utils.js';
 import { refreshEventCalendar } from '../../utils/event-calendar.js';
 
 /**
@@ -12,7 +12,7 @@ export default async function editEvent(interaction) {
 
   const eventName = interaction.options.getString('event_name');
 
-  const event = await Event.findOne({ name: { $regex: new RegExp(`^${eventName}$`, 'i') } });
+  const event = await findByIdOrName(Event, eventName);
 
   if (!event) {
     return interaction.editReply(`❌ No event found with the name **${eventName}**.`);
@@ -48,7 +48,7 @@ export default async function editEvent(interaction) {
   const startDateStr = interaction.options.getString('start_date');
   if (startDateStr) {
     const d = new Date(startDateStr);
-    if (isNaN(d.getTime())) return interaction.editReply('❌ Invalid start date.');
+    if (Number.isNaN(d.getTime())) return interaction.editReply('❌ Invalid start date.');
     updates.startDate = d;
     changed.push('start_date');
   }
@@ -56,7 +56,7 @@ export default async function editEvent(interaction) {
   const endDateStr = interaction.options.getString('end_date');
   if (endDateStr) {
     const d = new Date(endDateStr);
-    if (isNaN(d.getTime())) return interaction.editReply('❌ Invalid end date.');
+    if (Number.isNaN(d.getTime())) return interaction.editReply('❌ Invalid end date.');
     updates.endDate = d;
     changed.push('end_date');
   }
@@ -74,6 +74,11 @@ export default async function editEvent(interaction) {
   }
 
   const maxPoints = interaction.options.getInteger('max_points');
+  if ((pointsPerSubmission === null) !== (maxPoints === null)) {
+    return interaction.editReply(
+      '❌ `points_per_submission` and `max_points` must be provided together.',
+    );
+  }
   if (maxPoints !== null) {
     updates.maxPoints = maxPoints;
     changed.push('max_points');
@@ -97,8 +102,7 @@ export default async function editEvent(interaction) {
 
   const updated = await Event.findByIdAndUpdate(event._id, updates, { new: true });
 
-  // Refresh the calendar channel
-  refreshEventCalendar();
+  await refreshEventCalendar();
 
   channelLog(
     generateSystemLogContent('Event Edited', {

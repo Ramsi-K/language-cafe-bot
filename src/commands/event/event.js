@@ -23,7 +23,6 @@ const EVENT_TYPES = [
   { name: 'Listening', value: 'Listening' },
   { name: 'Speaking', value: 'Speaking' },
   { name: 'Writing', value: 'Writing' },
-  { name: 'Live Event', value: 'Live Event' },
   { name: 'Mixed', value: 'Mixed' },
   { name: 'Other', value: 'Other' },
 ];
@@ -87,7 +86,7 @@ const data = new SlashCommandBuilder()
       .addIntegerOption((o) =>
         o
           .setName('max_points')
-          .setDescription('Maximum points a participant can earn (required if points set)')
+          .setDescription('Maximum points a participant can earn (default: 200)')
           .setRequired(false)
           .setMinValue(1),
       )
@@ -263,7 +262,6 @@ export default {
   data,
 
   async execute(interaction) {
-    // Handle autocomplete for event_name across all subcommands
     if (interaction.isAutocomplete()) {
       return handleEventNameAutocomplete(interaction);
     }

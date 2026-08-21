@@ -1,4 +1,5 @@
 import { time } from 'discord.js';
+import mongoose from 'mongoose';
 import EventParticipant from '../../models/event-participant.js';
 import EventLeaderboard from '../../models/event-leaderboard.js';
 import Event from '../../models/event.js';
@@ -99,8 +100,8 @@ export async function buildLiveLeaderboardEmbed(event) {
   } else {
     const rows = top3.map((p, i) =>
       event.pointsPerSubmission
-        ? `${MEDALS[i]}　<@${p.userId}>　**${p.points}**`
-        : `${MEDALS[i]}　<@${p.userId}>　${p.submissionCount} submission${p.submissionCount === 1 ? '' : 's'}`,
+        ? `${MEDALS[i]} <@${p.userId}> **${p.points}**`
+        : `${MEDALS[i]} <@${p.userId}> ${p.submissionCount} submission${p.submissionCount === 1 ? '' : 's'}`,
     );
     description = rows.join('\n');
   }
@@ -169,6 +170,47 @@ export async function findActiveEventForChannel(channelId) {
 export function normaliseHashtag(raw) {
   const trimmed = raw.trim();
   return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
+}
+
+export function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export async function findByIdOrName(Model, selection) {
+  const normalizedSelection = selection.replace(
+    /\s+\[(?:Recurring|One-time)\s+·\s+[^\]]+\]$/,
+    '',
+  );
+
+  if (mongoose.isValidObjectId(normalizedSelection)) {
+    const byId = await Model.findById(normalizedSelection);
+    if (byId) return byId;
+  }
+
+  return Model.findOne({
+    name: { $regex: new RegExp(`^${escapeRegex(normalizedSelection)}$`, 'i') },
+  });
+}
+
+export async function incrementParticipantTotals({
+  eventId,
+  userId,
+  points = 0,
+  submissionCount = 0,
+}) {
+  const filter = { eventId, userId };
+  const update = { $inc: { points, submissionCount } };
+
+  try {
+    return await EventParticipant.findOneAndUpdate(filter, update, {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    });
+  } catch (error) {
+    if (error.code !== 11000) throw error;
+    return EventParticipant.findOneAndUpdate(filter, update, { new: true });
+  }
 }
 
 /**

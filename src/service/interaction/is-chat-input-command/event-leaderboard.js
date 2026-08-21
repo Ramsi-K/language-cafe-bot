@@ -1,7 +1,7 @@
 import Event from '../../../models/event.js';
 import EventLeaderboard from '../../../models/event-leaderboard.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
-import { buildLiveLeaderboardEmbed } from '../../utils/event-utils.js';
+import { buildLiveLeaderboardEmbed, findByIdOrName } from '../../utils/event-utils.js';
 import client from '../../../client/index.js';
 
 /**
@@ -19,7 +19,7 @@ export default async function eventLeaderboard(interaction) {
 
   const eventName = interaction.options.getString('event_name');
 
-  const event = await Event.findOne({ name: { $regex: new RegExp(`^${eventName}$`, 'i') } });
+  const event = await findByIdOrName(Event, eventName);
 
   if (!event) {
     return interaction.editReply(`❌ No event found with the name **${eventName}**.`);
@@ -42,7 +42,7 @@ export default async function eventLeaderboard(interaction) {
   }
 
   if (!channel) {
-    return interaction.editReply(`❌ Submission channel not found.`);
+    return interaction.editReply('❌ Submission channel not found.');
   }
 
   const existing = await EventLeaderboard.findOne({ eventId: event._id.toString() });

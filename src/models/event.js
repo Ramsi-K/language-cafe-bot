@@ -10,14 +10,13 @@ const eventSchema = new Schema(
     },
     eventType: {
       type: String,
-      enum: ['Reading', 'Listening', 'Speaking', 'Writing', 'Live Event', 'Mixed', 'Other'],
+      enum: ['Reading', 'Listening', 'Speaking', 'Writing', 'Mixed', 'Other'],
       required: true,
     },
     hashtag: {
       type: String,
       required: true,
     },
-    // Single channel where submissions are tracked
     submissionChannelId: {
       type: String,
       required: true,
@@ -36,7 +35,7 @@ const eventSchema = new Schema(
       default: null,
       min: 1,
     },
-    // Optional — required only when pointsPerSubmission is set
+    // Optional — defaults to 200 when points_per_submission is set
     maxPoints: {
       type: Number,
       default: null,
@@ -48,17 +47,14 @@ const eventSchema = new Schema(
       default: 0,
       min: 0,
     },
-    // Optional link to the original event post
     eventPostLink: {
       type: String,
       default: null,
     },
-    // Discord user ID of the event creator
     creatorId: {
       type: String,
       required: true,
     },
-    // Status: pending → active → ended
     status: {
       type: String,
       enum: ['pending', 'active', 'ended'],
@@ -75,7 +71,6 @@ eventSchema.index({ status: 1 });
 eventSchema.index({ status: 1, startDate: 1 });
 eventSchema.index({ status: 1, endDate: 1 });
 eventSchema.index({ status: 1, submissionChannelId: 1 });
-// For name autocomplete
 eventSchema.index({ name: 'text' });
 
 export default mongoose.model('event', eventSchema);

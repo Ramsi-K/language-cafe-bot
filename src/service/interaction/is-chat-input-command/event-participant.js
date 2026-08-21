@@ -3,10 +3,11 @@ import EventParticipant from '../../../models/event-participant.js';
 import EventSubmission from '../../../models/event-submission.js';
 import EventBan from '../../../models/event-ban.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
-import { updateLiveLeaderboard } from '../../utils/event-utils.js';
+import { findByIdOrName, updateLiveLeaderboard } from '../../utils/event-utils.js';
+import { hasManageEventsPermission } from '../../utils/permissions.js';
 
 async function findEventByName(name) {
-  return Event.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+  return findByIdOrName(Event, name);
 }
 
 /**
@@ -16,6 +17,10 @@ async function findEventByName(name) {
  */
 export async function eventParticipantRemove(interaction) {
   await interaction.deferReply({ ephemeral: true });
+
+  if (!hasManageEventsPermission(interaction)) {
+    return interaction.editReply('❌ You need the Manage Events permission to ban participants.');
+  }
 
   const eventName = interaction.options.getString('event_name');
   const targetUser = interaction.options.getUser('user');
@@ -99,6 +104,6 @@ export async function eventParticipantBan(interaction) {
 
   return interaction.editReply(
     `✅ <@${targetUser.id}> has been banned from earning points in **${event.name}**.\n` +
-      `Their existing points are unchanged. Use \`/event points remove\` to deduct them if needed.`,
+      'Their existing points are unchanged. Use `/event points remove` to deduct them if needed.',
   );
 }

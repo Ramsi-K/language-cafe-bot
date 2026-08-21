@@ -1,10 +1,15 @@
 import Event from '../../../models/event.js';
 import EventParticipant from '../../../models/event-participant.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
-import { updateLiveLeaderboard } from '../../utils/event-utils.js';
+import {
+  findByIdOrName,
+  incrementParticipantTotals,
+  updateLiveLeaderboard,
+} from '../../utils/event-utils.js';
+import { hasManageEventsPermission } from '../../utils/permissions.js';
 
 async function findEventByName(name) {
-  return Event.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+  return findByIdOrName(Event, name);
 }
 
 /**
@@ -13,6 +18,10 @@ async function findEventByName(name) {
  */
 export async function eventPointsAdd(interaction) {
   await interaction.deferReply({ ephemeral: true });
+
+  if (!hasManageEventsPermission(interaction)) {
+    return interaction.editReply('❌ You need the Manage Events permission to change points.');
+  }
 
   const eventName = interaction.options.getString('event_name');
   const targetUser = interaction.options.getUser('user');
@@ -25,31 +34,25 @@ export async function eventPointsAdd(interaction) {
     return interaction.editReply(`❌ **${event.name}** has no points configured.`);
   }
 
-  let participant = await EventParticipant.findOne({
+  const participant = await EventParticipant.findOne({
     eventId: event._id.toString(),
     userId: targetUser.id,
   });
 
-  if (!participant) {
-    participant = new EventParticipant({
-      eventId: event._id.toString(),
-      userId: targetUser.id,
-      points: 0,
-      submissionCount: 0,
-    });
-  }
-
-  const before = participant.points;
-  participant.points = Math.min(participant.points + amount, event.maxPoints);
-  const actual = participant.points - before;
-  await participant.save();
+  const before = participant?.points ?? 0;
+  const actual = Math.min(amount, Math.max(0, event.maxPoints - before));
+  const updatedParticipant = await incrementParticipantTotals({
+    eventId: event._id.toString(),
+    userId: targetUser.id,
+    points: actual,
+  });
 
   channelLog(
     generateSystemLogContent('Event Points Added (Manual)', {
       event: `\`${event.name}\``,
       user: `<@${targetUser.id}>`,
       added: `\`+${actual}\``,
-      total: `\`${participant.points}/${event.maxPoints}\``,
+      total: `\`${updatedParticipant.points}/${event.maxPoints}\``,
       moderator: `<@${interaction.user.id}>`,
     }),
   );
@@ -58,7 +61,7 @@ export async function eventPointsAdd(interaction) {
 
   return interaction.editReply(
     `✅ Added **${actual}** points to <@${targetUser.id}> for **${event.name}**.\n` +
-      `New total: **${participant.points}** / ${event.maxPoints}`,
+      `New total: **${updatedParticipant.points}** / ${event.maxPoints}`,
   );
 }
 
@@ -68,6 +71,10 @@ export async function eventPointsAdd(interaction) {
  */
 export async function eventPointsRemove(interaction) {
   await interaction.deferReply({ ephemeral: true });
+
+  if (!hasManageEventsPermission(interaction)) {
+    return interaction.editReply('❌ You need the Manage Events permission to change points.');
+  }
 
   const eventName = interaction.options.getString('event_name');
   const targetUser = interaction.options.getUser('user');
@@ -90,16 +97,19 @@ export async function eventPointsRemove(interaction) {
   }
 
   const before = participant.points;
-  participant.points = Math.max(0, participant.points - amount);
-  const actual = before - participant.points;
-  await participant.save();
+  const actual = Math.min(amount, before);
+  const updatedParticipant = await EventParticipant.findOneAndUpdate(
+    { eventId: event._id.toString(), userId: targetUser.id },
+    { $inc: { points: -actual } },
+    { new: true },
+  );
 
   channelLog(
     generateSystemLogContent('Event Points Removed (Manual)', {
       event: `\`${event.name}\``,
       user: `<@${targetUser.id}>`,
       removed: `\`-${actual}\``,
-      total: `\`${participant.points}/${event.maxPoints}\``,
+      total: `\`${updatedParticipant.points}/${event.maxPoints}\``,
       moderator: `<@${interaction.user.id}>`,
     }),
   );
@@ -108,6 +118,6 @@ export async function eventPointsRemove(interaction) {
 
   return interaction.editReply(
     `✅ Removed **${actual}** points from <@${targetUser.id}> for **${event.name}**.\n` +
-      `New total: **${participant.points}** / ${event.maxPoints}`,
+      `New total: **${updatedParticipant.points}** / ${event.maxPoints}`,
   );
 }

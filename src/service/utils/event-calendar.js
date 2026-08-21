@@ -1,18 +1,17 @@
 import Event from '../../models/event.js';
+import LiveEvent from '../../models/live-event.js';
 import client from '../../client/index.js';
 import config from '../../config/index.js';
 import channelLog, { generateSystemLogContent } from './channel-log.js';
+import { formatDateUTC, getOccurrencesOnDate, toUnixTimestamp } from './live-event-utils.js';
 
 const { EVENT_CALENDAR_CHANNEL_ID: calendarChannelId } = config;
-
-// ─── Category squares ─────────────────────────────────────────────────────────
 
 const CATEGORY_SQUARE = {
   Reading: '🟥',
   Listening: '🟨',
   Speaking: '🟦',
   Writing: '🟩',
-  'Live Event': '🩷',
   Mixed: '🟧',
   Other: '🟪',
 };
@@ -20,13 +19,9 @@ const CATEGORY_SQUARE = {
 const LEGEND =
   '🟥 Reading · 🟨 Listening · 🟦 Speaking · 🟩 Writing · 🩷 Live Event · 🟧 Mixed · 🟪 Other';
 
-// ─── Embed builder ────────────────────────────────────────────────────────────
+// ─── Standard events embed ────────────────────────────────────────────────────
 
-/**
- * Builds a single embed showing all currently active events.
- * Each event appears once as a line item — no day-by-day expansion.
- */
-function buildCalendarEmbed(events) {
+function buildStandardEmbed(events, liveEvents) {
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -34,7 +29,7 @@ function buildCalendarEmbed(events) {
     timeZone: 'UTC',
   });
 
-  if (events.length === 0) {
+  if (events.length === 0 && liveEvents.length === 0) {
     return {
       color: 0x5865f2,
       title: '🗓️ Language Cafe Event Calendar',
@@ -48,21 +43,33 @@ function buildCalendarEmbed(events) {
     return `${square} ${name}`;
   });
 
+  const liveLines = liveEvents.map(({ liveEvent, occurrences }) => {
+    const name = liveEvent.eventPostLink
+      ? `[${liveEvent.name}](${liveEvent.eventPostLink})`
+      : liveEvent.name;
+    const hosts = liveEvent.hostIds?.length
+      ? ` · ${liveEvent.hostIds.map((id) => `<@${id}>`).join(', ')}`
+      : '';
+    const times = occurrences
+      .map(
+        (occurrence) =>
+          `<t:${toUnixTimestamp(occurrence.date, occurrence.startTime)}:t>–<t:${toUnixTimestamp(occurrence.date, occurrence.endTime)}:t>`,
+      )
+      .join(', ');
+
+    return `🩷 ${name} · ${times}${hosts} · <#${liveEvent.locationChannelId}>`;
+  });
+
   return {
     color: 0x5865f2,
     title: '🗓️ Language Cafe Event Calendar',
-    description: `**Today's Events · ${today}**\n${LEGEND}\n\n` + lines.join('\n'),
+    description:
+      `**Today's Events · ${today}**\n${LEGEND}\n\n` + [...lines, ...liveLines].join('\n'),
   };
 }
 
 // ─── Channel refresh ──────────────────────────────────────────────────────────
 
-/**
- * Clears all bot messages in the #event-calendar channel and reposts
- * a single embed listing all currently active events.
- *
- * No-op if EVENT_CALENDAR_CHANNEL_ID is not configured.
- */
 export async function refreshEventCalendar() {
   try {
     if (!calendarChannelId) return;
@@ -84,14 +91,26 @@ export async function refreshEventCalendar() {
       }
     }
 
-    // Fetch active events sorted by start date
+    // Fetch active standard events
     const events = await Event.find({ status: 'active' }).sort({ startDate: 1 });
 
-    await channel.send({ embeds: [buildCalendarEmbed(events)] });
+    // Only include live-event series with an occurrence scheduled for today.
+    const todayStr = formatDateUTC(new Date());
+    const liveEvents = (await LiveEvent.find({ status: { $in: ['upcoming', 'live'] } }))
+      .map((liveEvent) => ({
+        liveEvent,
+        occurrences: getOccurrencesOnDate(liveEvent, todayStr),
+      }))
+      .filter(({ occurrences }) => occurrences.length > 0);
+
+    await channel.send({
+      embeds: [buildStandardEmbed(events, liveEvents)],
+    });
 
     channelLog(
       generateSystemLogContent('Event Calendar Refreshed', {
         activeEvents: `\`${events.length}\``,
+        liveEvents: `\`${liveEvents.length}\``,
       }),
     );
   } catch (err) {

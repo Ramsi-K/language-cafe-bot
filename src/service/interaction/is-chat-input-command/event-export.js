@@ -1,4 +1,5 @@
 import Event from '../../../models/event.js';
+import { findByIdOrName } from '../../utils/event-utils.js';
 import EventParticipant from '../../../models/event-participant.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
 
@@ -14,7 +15,7 @@ export default async function eventExport(interaction) {
 
   const eventName = interaction.options.getString('event_name');
 
-  const event = await Event.findOne({ name: { $regex: new RegExp(`^${eventName}$`, 'i') } });
+  const event = await findByIdOrName(Event, eventName);
 
   if (!event) {
     return interaction.editReply(`❌ No event found with the name **${eventName}**.`);
@@ -77,4 +78,6 @@ export default async function eventExport(interaction) {
       requestedBy: `<@${interaction.user.id}>`,
     }),
   );
+
+  return undefined;
 }

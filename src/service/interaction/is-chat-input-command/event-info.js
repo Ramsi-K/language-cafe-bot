@@ -1,6 +1,7 @@
 import { time } from 'discord.js';
 import Event from '../../../models/event.js';
 import EventParticipant from '../../../models/event-participant.js';
+import { findByIdOrName } from '../../utils/event-utils.js';
 import channelLog, { generateInteractionCreateLogContent } from '../../utils/channel-log.js';
 
 /**
@@ -14,7 +15,7 @@ export default async function eventInfo(interaction) {
 
   const eventName = interaction.options.getString('event_name');
 
-  const event = await Event.findOne({ name: { $regex: new RegExp(`^${eventName}$`, 'i') } });
+  const event = await findByIdOrName(Event, eventName);
 
   if (!event) {
     return interaction.editReply(`❌ No event found with the name **${eventName}**.`);

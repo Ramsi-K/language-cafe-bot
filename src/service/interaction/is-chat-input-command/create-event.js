@@ -16,26 +16,28 @@ export default async function createEvent(interaction) {
   const startDateStr = interaction.options.getString('start_date');
   const endDateStr = interaction.options.getString('end_date');
   const pointsPerSubmission = interaction.options.getInteger('points_per_submission') ?? null;
-  const maxPoints = interaction.options.getInteger('max_points') ?? null;
+  const maxPoints =
+    interaction.options.getInteger('max_points') ?? (pointsPerSubmission ? 200 : null);
   const creatorBonus = interaction.options.getInteger('creator_bonus') ?? 0;
   const eventPostLink = interaction.options.getString('event_post_link') ?? null;
 
-  // If one of points/maxPoints is set, both must be set
-  if ((pointsPerSubmission === null) !== (maxPoints === null)) {
+  // If points_per_submission is set, max_points defaults to 200 but can be overridden.
+  // If neither is set, both remain null (tracking-only mode).
+  if (pointsPerSubmission !== null && maxPoints === null) {
     return interaction.editReply(
-      '❌ `points_per_submission` and `max_points` must both be set or both left empty.',
+      '❌ `max_points` is required when `points_per_submission` is set.',
     );
   }
 
   const startDate = new Date(startDateStr);
   const endDate = new Date(endDateStr);
 
-  if (isNaN(startDate.getTime())) {
+  if (Number.isNaN(startDate.getTime())) {
     return interaction.editReply(
       '❌ Invalid start date. Use UTC format: `YYYY-MM-DDTHH:MM` or `YYYY-MM-DD HH:MM`.',
     );
   }
-  if (isNaN(endDate.getTime())) {
+  if (Number.isNaN(endDate.getTime())) {
     return interaction.editReply(
       '❌ Invalid end date. Use UTC format: `YYYY-MM-DDTHH:MM` or `YYYY-MM-DD HH:MM`.',
     );
@@ -64,8 +66,7 @@ export default async function createEvent(interaction) {
 
   await event.save();
 
-  // Refresh the calendar channel
-  refreshEventCalendar();
+  await refreshEventCalendar();
 
   channelLog(
     generateSystemLogContent('Event Created', {
