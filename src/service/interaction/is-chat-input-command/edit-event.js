@@ -1,6 +1,7 @@
 import Event from '../../../models/event.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
 import { normaliseHashtag } from '../../utils/event-utils.js';
+import { refreshEventCalendar } from '../../utils/event-calendar.js';
 
 /**
  * /event edit
@@ -95,6 +96,9 @@ export default async function editEvent(interaction) {
   }
 
   const updated = await Event.findByIdAndUpdate(event._id, updates, { new: true });
+
+  // Refresh the calendar channel
+  refreshEventCalendar();
 
   channelLog(
     generateSystemLogContent('Event Edited', {

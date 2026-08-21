@@ -5,6 +5,7 @@ import EventSubmission from '../../../models/event-submission.js';
 import EventBan from '../../../models/event-ban.js';
 import EventLeaderboard from '../../../models/event-leaderboard.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
+import { refreshEventCalendar } from '../../utils/event-calendar.js';
 
 /**
  * /event remove
@@ -83,6 +84,9 @@ export async function handleEventRemoveConfirm(interaction) {
       removedBy: `<@${interaction.user.id}>`,
     }),
   );
+
+  // Refresh the calendar channel
+  refreshEventCalendar();
 
   return interaction.editReply({
     content: `🗑️ Event **${event.name}** and all associated data have been permanently deleted.`,

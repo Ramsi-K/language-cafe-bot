@@ -1,5 +1,6 @@
 import Event from '../../models/event.js';
 import channelLog, { generateSystemLogContent } from '../utils/channel-log.js';
+import { refreshEventCalendar } from '../utils/event-calendar.js';
 
 /**
  * Runs every hour.
@@ -58,6 +59,7 @@ export default async function eventLifecycle() {
           closed: `\`${toClose.length}\``,
         }),
       );
+      await refreshEventCalendar();
     }
   } catch (err) {
     console.error('Error in eventLifecycle:', err);

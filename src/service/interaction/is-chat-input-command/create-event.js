@@ -1,6 +1,7 @@
 import Event from '../../../models/event.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
 import { normaliseHashtag } from '../../utils/event-utils.js';
+import { refreshEventCalendar } from '../../utils/event-calendar.js';
 
 /**
  * /event create
@@ -62,6 +63,9 @@ export default async function createEvent(interaction) {
   });
 
   await event.save();
+
+  // Refresh the calendar channel
+  refreshEventCalendar();
 
   channelLog(
     generateSystemLogContent('Event Created', {

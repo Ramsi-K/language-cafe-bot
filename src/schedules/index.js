@@ -7,12 +7,17 @@ import trackerDailyMaintenance from '../service/schedules/tracker-daily-maintena
 import trackerWeeklySnapshots from '../service/schedules/tracker-weekly-snapshots.js';
 import trackerDailyReminders from '../service/schedules/tracker-daily-reminders.js';
 import eventLifecycle from '../service/schedules/event-lifecycle.js';
+import { refreshEventCalendar } from '../service/utils/event-calendar.js';
 
 export default function schedules() {
   // every 10 seconds
   // schedule.scheduleJob('*/10 * * * * *', async () => {
 
   // });
+
+  // Run immediately on startup to catch any state changes while the bot was down
+  eventLifecycle();
+  refreshEventCalendar();
 
   // every hour
   schedule.scheduleJob('0 * * * *', () => {
@@ -26,6 +31,8 @@ export default function schedules() {
     sendANewMatchMatchMessage();
     trackerDailyMaintenance();
     trackerDailyReminders();
+    // Refresh calendar daily so date headings stay current
+    refreshEventCalendar();
   });
 
   // every Sunday at 01:00 (weekly snapshots)
