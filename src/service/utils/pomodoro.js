@@ -57,7 +57,7 @@ export function helpView(commandId) {
 
           '**Getting started**\n'
             + `</pomodoro join:${commandId}> — Join a group or start a preset timer.\n`
-            + `</pomodoro create:${commandId}> — Create a custom study group.`,
+            + `</pomodoro create:${commandId}> — Create a custom session with your own study/break pattern (e.g. \`25/5\` or \`25/5/15/20\`). The pattern repeats automatically.`,
 
           '**During a session**\n'
             + 'Tap **I\'m here** when prompted to stay in your group.\n'
