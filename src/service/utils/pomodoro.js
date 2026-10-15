@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { escapeMarkdown, PermissionFlagsBits } from 'discord.js';
 import config from '../../config/index.js';
 import PomodoroGroup from '../../models/pomodoro-group.js';
@@ -242,22 +241,6 @@ allowedMentions: { parse: [] } };
     } catch (error) { console.error('Pomodoro goodbye delivery:', error); }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  initialCheckIn(group) {
-    Object.assign(group, { checkIn: {
-      id: randomUUID(),
-initial: true,
-study: false,
-      deadline: group.stageEndsAt,
-      participants: group.members.map((userId) => ({
-        userId, joinedAt: group.joinedAt.get(userId),
-      })),
-      responded: [],
-delivered: false,
-dirty: true,
-    } });
-  }
-
   async publish(group) {
     const channel = await this.client.channels.fetch(group.channelId);
     const view = sessionView(group);
@@ -448,7 +431,6 @@ dirty: true,
       joinedAt: new Map([[interaction.user.id, now]]),
     });
     startStage(group, 0, now);
-    this.initialCheckIn(group);
     await group.save();
     await this.announceMember(group, interaction, true);
     return sessionView(group);
@@ -487,7 +469,7 @@ dirty: true,
     group.controllerId = controllerOf(group) || interaction.user.id;
     group.members.push(interaction.user.id);
     group.joinedAt.set(interaction.user.id, now);
-    if (starting) this.initialCheckIn(group);
+    if (starting) group.checkIn = undefined;
     group.announcementPending = true;
     await group.save();
     await this.announceMember(group, interaction, starting);
