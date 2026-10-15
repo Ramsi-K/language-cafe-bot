@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { escapeMarkdown, PermissionFlagsBits } from 'discord.js';
+import config from '../../config/index.js';
 import PomodoroGroup from '../../models/pomodoro-group.js';
 import PomodoroStage from '../../models/pomodoro-stage.js';
 import { PRESETS, parsePattern, startStage, attendanceFor, recoverTiming } from './pomodoro-timing.js';
@@ -37,17 +39,54 @@ export function sessionView(group) {
       button('Leave', 'leave', group._id),
       button('Skip stage', 'skip', `${group._id}:${group.stageId}`),
       button('Stop timer', 'stop', `${group._id}:${group.stageId}`, 4),
+      ...(group.members.length && group.stageEndsAt ? [{
+        ...button('Invite Members', 'invite', `${group._id}:${group.startTimeStamp}`),
+        disabled: Boolean(group.inviteUsed),
+      }] : []),
     ])],
+  };
+}
+
+export function helpView(commandId) {
+  return {
+    embeds: [
+      {
+        title: 'Pomodoro Help',
+        color: 0xA9A1C8,
+        description: [
+          'Study together with repeating study and break timers.',
+
+          '**Getting started**\n'
+            + `</pomodoro join:${commandId}> — Join a group or start a preset timer.\n`
+            + `</pomodoro create:${commandId}> — Create a custom study group.`,
+
+          '**During a session**\n'
+            + 'Tap **I\'m here** when prompted to stay in your group.\n'
+            + 'Use **Leave** to exit. The controller can skip stages, '
+            + 'stop the timer, or invite others.',
+
+          '**Other commands**\n'
+            + `</pomodoro status:${commandId}> — View active groups.\n`
+            + `</pomodoro leaderboard:${commandId}> — See your study progress.`,
+        ].join('\n\n'),
+      },
+    ],
+    components: [],
+    allowedMentions: { parse: [] },
   };
 }
 
 // All interactions and ticks share one queue, including membership checks across
 // groups. Run one bot process for a Discord token (as with the existing schedules).
 export class PomodoroService {
-  constructor({ groups = PomodoroGroup, stages = PomodoroStage, now = Date.now } = {}) {
+  constructor({
+    groups = PomodoroGroup, stages = PomodoroStage, now = Date.now, settings = config,
+  } = {}) {
     this.groups = groups;
     this.stages = stages;
     this.now = now;
+    this.settings = settings;
+    this.acceptedInvites = new Set();
     this.tail = Promise.resolve();
   }
 
@@ -74,10 +113,16 @@ export class PomodoroService {
   }
 
   async finish(group) {
+    const endedMessageId = group.statusMessageId;
     const departures = group.members.map((userId) => ({
       userId, joinedAt: group.joinedAt.get(userId),
     }));
     const rounds = group.completedRounds || 0;
+    const minutes = Math.floor((group.completedStudyMilliseconds || 0) / 60000);
+    const duration = `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+    const endAnnouncement = `## \u{1F3C1} Pomodoro session ended!\n-# ${escapeMarkdown(labelOf(group))}`
+      + ` \u00b7 ${rounds} study ${rounds === 1 ? 'round' : 'rounds'} completed`
+      + (group.completedStudyMilliseconds !== undefined ? ` \u00b7 ${duration} studied` : '');
     const summary = { content: `## 🍅 ${labelOf(group)}\nSession ended\n-# ${rounds} study ${rounds === 1 ? 'round' : 'rounds'} completed`,
       components: [],
 allowedMentions: { parse: [] } };
@@ -88,6 +133,9 @@ allowedMentions: { parse: [] } };
     if (group.permanent) {
       Object.assign(group, {
         members: [],
+        statusMessageId: undefined,
+        inviteUsed: false,
+        completedStudyMilliseconds: 0,
         joinedAt: new Map(),
         stageId: undefined,
         stageStartedAt: undefined,
@@ -100,13 +148,83 @@ allowedMentions: { parse: [] } };
     } else {
       await this.groups.deleteOne({ _id: group._id });
     }
+    this.acceptedInvites.delete(`${group._id}:${group.startTimeStamp}`);
+    await this.announce(group, endAnnouncement);
     await this.sayGoodbye(group, departures, 'The session ended.');
-    if (group.statusMessageId) {
+    if (endedMessageId) {
       try {
         const channel = await this.client.channels.fetch(group.channelId);
-        await channel.messages.edit(group.statusMessageId, summary);
+        await channel.messages.edit(endedMessageId, summary);
       } catch (error) { console.error('Pomodoro final status update failed:', error); }
     }
+  }
+
+  async announce(group, content) {
+    try {
+      const channel = await this.client.channels.fetch(group.channelId);
+      await channel.send({ content, allowedMentions: { parse: [] } });
+    } catch (error) { console.error('Pomodoro announcement delivery:', error); }
+  }
+
+  async announceMember(group, interaction, starting) {
+    const name = escapeMarkdown(interaction.member?.displayName || interaction.member?.nick
+      || interaction.user.globalName || interaction.user.username || 'A member');
+    const schedule = group.timeOption.map((minutes, index) =>
+      `${minutes} min ${index % 2 === 0 ? 'study' : 'break'}`).join(' / ');
+    const content = starting
+      ? `## \u{1F345} ${name} started a new Pomodoro session!\n-# ${escapeMarkdown(labelOf(group))} \u00b7 ${schedule}`
+      : `## \u{1F426} A new study partner has joined!\n-# ${name} joined **${escapeMarkdown(labelOf(group))}** \u00b7 Round ${group.studyRound || 1}`;
+    await this.announce(group, content);
+  }
+
+  async invite(interaction, id, sessionStart) {
+    const group = await this.groups.findOne({ _id: id, guildId: interaction.guildId });
+    if (!group?.members.length || !group.stageEndsAt || !await this.settle(group)) {
+      throw new Error('This session has ended. Use /pomodoro join to choose another.');
+    }
+    if (String(group.startTimeStamp) !== sessionStart) {
+      throw new Error('This invitation button belongs to an ended session. Use /pomodoro status.');
+    }
+    if (controllerOf(group) !== interaction.user.id) {
+      throw new Error('Only the current controller can invite members.');
+    }
+    const key = `${group._id}:${group.startTimeStamp}`;
+    if (group.inviteUsed || this.acceptedInvites.has(key)) {
+      // Also protects against another click after Discord accepted a send but MongoDB failed.
+      group.inviteUsed = true;
+      group.announcementPending = true;
+      await group.save();
+      throw new Error('An invitation has already been sent for this session.');
+    }
+    const roleId = this.settings.POMODORO_ROLE_ID;
+    if (group.guildId !== this.settings.SERVER_ID || !/^\d{17,20}$/.test(roleId || '')) {
+      throw new Error('The Pomodoro role is not configured for this server. Set POMODORO_ROLE_ID.');
+    }
+    const channel = await this.client.channels.fetch(group.channelId);
+    let role;
+    try {
+      role = await channel.guild.roles.fetch(roleId);
+    } catch (error) {
+      if (error.code !== 10011) throw error;
+      throw new Error('The configured Pomodoro role does not exist in this server.');
+    }
+    if (!role || role.id === group.guildId) {
+      throw new Error('The configured Pomodoro role does not exist in this server.');
+    }
+    const me = channel.guild.members.me || await channel.guild.members.fetchMe();
+    const canMention = channel.permissionsFor(me)?.has(PermissionFlagsBits.MentionEveryone);
+    if (!role.mentionable && !canMention) {
+      throw new Error('The Pomodoro role cannot be mentioned by the bot. Check its mention permissions.');
+    }
+    await channel.send({
+      content: `<@&${roleId}> \u{1F345} <@${controllerOf(group)}> is looking for study partners!\n\nJoin their session here.`,
+      allowedMentions: { parse: [], roles: [roleId], users: [] },
+      components: [row([button('Join Session', 'join-session', `${group._id}:${group.startTimeStamp}`, 3)])],
+    });
+    this.acceptedInvites.add(key);
+    group.inviteUsed = true;
+    group.announcementPending = true;
+    await group.save();
   }
 
   async sayGoodbye(group, participants, reason, endedAt = this.now()) {
@@ -116,7 +234,7 @@ allowedMentions: { parse: [] } };
       // Keep each goodbye well within Discord's message and mention limits.
       for (const { userId, joinedAt } of participants) {
         await channel.send({
-          content: `## 👋 Goodbye <@${userId}>\n`
+          content: `👋 Goodbye <@${userId}>\n`
             + `-# ${labelOf(group)} · ${subscribedDuration(joinedAt ?? endedAt, endedAt)} subscribed · ${reason}`,
           allowedMentions: { parse: [], users: [userId] },
         });
@@ -229,6 +347,10 @@ dirty: true,
       // that just elapsed in the session summary, without granting study credit.
       if (absent.length && group.stageIndex % 2 === 0 && group.stageEndsAt <= this.now()) {
         Object.assign(group, { completedRounds: (group.completedRounds || 0) + 1 });
+        if (group.completedStudyMilliseconds !== undefined) {
+          Object.assign(group, { completedStudyMilliseconds: group.completedStudyMilliseconds
+            + group.stageEndsAt - group.stageStartedAt });
+        }
       }
       await this.finish(group);
       await this.sayGoodbye(group, departures, 'You missed the check-in deadline.', endedAt);
@@ -251,6 +373,10 @@ dirty: true,
         attendance: attendanceFor(group),
       } }, { upsert: true });
       Object.assign(group, { completedRounds: (group.completedRounds || 0) + 1 });
+      if (group.completedStudyMilliseconds !== undefined) {
+        Object.assign(group, { completedStudyMilliseconds: group.completedStudyMilliseconds
+          + group.stageEndsAt - group.stageStartedAt });
+      }
     }
     const nextIndex = (group.stageIndex + 1) % group.timeOption.length;
     if (nextIndex % 2 === 0) {
@@ -315,6 +441,8 @@ dirty: true,
       startTimeStamp: now,
       studyRound: 1,
       completedRounds: 0,
+      completedStudyMilliseconds: 0,
+      inviteUsed: false,
       channelId: interaction.channelId,
       members: [interaction.user.id],
       joinedAt: new Map([[interaction.user.id, now]]),
@@ -322,25 +450,38 @@ dirty: true,
     startStage(group, 0, now);
     this.initialCheckIn(group);
     await group.save();
+    await this.announceMember(group, interaction, true);
     return sessionView(group);
   }
 
-  async join(interaction, id) {
+  async join(interaction, id, sessionStart) {
     if (await this.current(interaction.user.id)) throw new Error('Leave your current Pomodoro group first.');
     const group = await this.groups.findOne({ _id: id, guildId: interaction.guildId });
     if (!group) throw new Error('This group has ended. Use /pomodoro join to choose another.');
-    if (!await this.settle(group) && !group.permanent) throw new Error('This group has ended.');
+    // Invitation buttons bind to one active run, including for reusable presets.
+    if (sessionStart !== undefined && (String(group.startTimeStamp) !== sessionStart
+      || !group.members.length || !group.stageEndsAt)) {
+      throw new Error('This invited session has ended.');
+    }
+    const active = await this.settle(group);
+    if (sessionStart !== undefined && (!active || !group.members.length)) {
+      throw new Error('This invited session has ended.');
+    }
+    if (!active && !group.permanent) throw new Error('This group has ended.');
     if (group.members.length >= 50) throw new Error('This group is full (50 participants).');
     const now = this.now();
     const starting = !group.members.length;
     if (starting) {
-      if (group.channelId !== interaction.channelId) group.statusMessageId = undefined;
+      // A new preset run gets fresh controls, even when it starts in the same channel.
+      group.statusMessageId = undefined;
       group.channelId = interaction.channelId;
       group.ownerId = interaction.user.id;
       group.controllerId = interaction.user.id;
       group.startTimeStamp = now;
       group.studyRound = 1;
       group.completedRounds = 0;
+      group.completedStudyMilliseconds = 0;
+      group.inviteUsed = false;
       startStage(group, 0, now);
     }
     group.controllerId = controllerOf(group) || interaction.user.id;
@@ -349,6 +490,7 @@ dirty: true,
     if (starting) this.initialCheckIn(group);
     group.announcementPending = true;
     await group.save();
+    await this.announceMember(group, interaction, starting);
     return sessionView(group);
   }
 
@@ -490,7 +632,7 @@ dirty: true,
   async handle(interaction) {
     const isButton = interaction.isButton();
     if (isButton) await interaction.deferUpdate();
-    else await interaction.deferReply({ ephemeral: false });
+    else await interaction.deferReply({ ephemeral: interaction.options.getSubcommand() === 'help' });
     try {
       const result = await this.serial(async () => {
         if (!interaction.guildId) throw new Error('Use Pomodoro in a server channel.');
@@ -502,6 +644,10 @@ dirty: true,
           }
           if (action === 'confirm') await this.confirm(interaction, id);
           else if (action === 'join') await this.join(interaction, id);
+          else if (action === 'join-session') {
+            if (!stageId) throw new Error('This invitation is invalid or has expired.');
+            await this.join(interaction, id, stageId);
+          } else if (action === 'invite') await this.invite(interaction, id, stageId);
           else if (action === 'leave') await this.leave(interaction, id);
           else if (action === 'skip' || action === 'stop') await this.control(interaction, action, id, stageId);
           else throw new Error('This Pomodoro button is no longer supported.');
@@ -509,6 +655,7 @@ dirty: true,
           return null;
         }
         const subcommand = interaction.options.getSubcommand();
+        if (subcommand === 'help') return helpView(interaction.commandId);
         if (subcommand === 'create') {
           const view = await this.create(interaction);
           const group = await this.current(interaction.user.id);
@@ -542,8 +689,17 @@ dirty: true,
           if (!group.permanent || group.stageEndsAt) await this.finish(group);
           continue;
         }
+        if (!group.inviteUsed && this.acceptedInvites.has(`${group._id}:${group.startTimeStamp}`)) {
+          group.inviteUsed = true;
+          group.announcementPending = true;
+          await group.save();
+        }
         if (!await this.settle(group)) continue;
-        if (group.checkIn?.dirty) await this.publishCheckIn(group);
+        if (group.checkIn?.dirty) {
+          try { await this.publishCheckIn(group); } catch (error) {
+            console.error(`Pomodoro check-in delivery ${group._id}:`, error);
+          }
+        }
         if (group.announcementPending || !group.statusMessageId) await this.publish(group);
       } catch (error) { console.error(`Pomodoro session ${group._id}:`, error); }
     }

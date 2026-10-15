@@ -46,12 +46,19 @@ export function recoverTiming(group, now) {
   let startedAt = group.stageStartedAt;
   let completed = group.completedRounds || 0;
   let round = group.studyRound || 1;
+  let studyTime = group.completedStudyMilliseconds;
   const cycles = Math.floor(Math.max(0, now - startedAt) / cycle);
   startedAt += cycles * cycle;
+  if (studyTime !== undefined) {
+    studyTime += cycles * durations.reduce((sum, value, i) => sum + (i % 2 === 0 ? value : 0), 0);
+  }
   completed += cycles * (durations.length / 2);
   round += cycles * (durations.length / 2);
   while (startedAt + durations[index] <= now) {
-    if (index % 2 === 0) completed += 1;
+    if (index % 2 === 0) {
+      completed += 1;
+      if (studyTime !== undefined) studyTime += durations[index];
+    }
     startedAt += durations[index];
     index = (index + 1) % durations.length;
     if (index % 2 === 0) round += 1;
@@ -59,6 +66,7 @@ export function recoverTiming(group, now) {
   if (startedAt !== group.stageStartedAt) startStage(group, index, startedAt);
   Object.assign(group, {
     completedRounds: completed,
+    completedStudyMilliseconds: studyTime,
     studyRound: round,
     // Conservatively count only time after recovery, and only after confirmation.
     creditStartedAt: now,

@@ -12,6 +12,7 @@ export default {
       .addStringOption((option) => option.setName('timer-pattern')
         .setDescription('Alternating study/break minutes, for example 25/5')
         .setMaxLength(47).setRequired(true)))
+    .addSubcommand((sub) => sub.setName('help').setDescription('Learn how Pomodoro sessions work (only visible to you)'))
     .addSubcommand((sub) => sub.setName('join').setDescription('Choose a group or permanent preset'))
     .addSubcommand((sub) => sub.setName('leave').setDescription('Leave your current group'))
     .addSubcommand((sub) => sub.setName('status').setDescription('View all active Pomodoro sessions in this server'))
