@@ -10,6 +10,8 @@ const pomodoroGroup = new Schema(
     ownerId: String,
     controllerId: String,
     statusMessageId: String,
+    inviteUsed: { type: Boolean, default: false },
+    completedStudyMilliseconds: Number,
     studyRound: { type: Number, default: 1 },
     completedRounds: { type: Number, default: 0 },
     checkIn: {
